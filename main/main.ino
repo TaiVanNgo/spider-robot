@@ -1,6 +1,9 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
+// GPIO 21 → SDA
+// GPIO 22 → SCL
+
 // Create an instance of the PCA9685 driver
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 
@@ -24,58 +27,80 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 void setup()
 {
   Serial.begin(115200);
+  Serial.println("Spider Robot Initialized. Type 'happy' to perform the happy action.");
 
   // Initialize PCA9685
   pwm.begin();
   pwm.setPWMFreq(50); // Set frequency to 50 Hz for servos
 
-  // Set initial knee positions to 0° for a standing position
-  int kneePulseLength = map(0, 0, 180, SERVOMIN, SERVOMAX);
-  pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, kneePulseLength);
-  pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, kneePulseLength);
-  pwm.setPWM(BACK_LEFT_KNEE_CHANNEL, 0, kneePulseLength);
-  pwm.setPWM(BACK_RIGHT_KNEE_CHANNEL, 0, kneePulseLength);
-
-  // set default position for spider's hip
-  int hipPulseLength1 = map(0, 0, 180, SERVOMIN, SERVOMAX);
-  int hipPulseLength2 = map(45, 0, 180, SERVOMIN, SERVOMAX);
-  pwm.setPWM(FRONT_LEFT_HIP_CHANNEL, 0, hipPulseLength1);  // 0 deg by default
-  pwm.setPWM(FRONT_RIGHT_HIP_CHANNEL, 0, hipPulseLength2); // 45 deg by default
-  pwm.setPWM(BACK_LEFT_HIP_CHANNEL, 0, hipPulseLength1);   // 0 deg by default
-  pwm.setPWM(BACK_RIGHT_HIP_CHANNEL, 0, hipPulseLength2);  // 45 deg by default
+  idle();
 }
 
 void loop()
 {
-  pullUpAction(); // Perform a happy dance
-  delay(1000);    // Hold position for 1 second
-  idle();         // Return to default state
+  // Check for user input from Serial Monitor
+  if (Serial.available())
+  {
+    String command = Serial.readStringUntil('\n'); // Read user input until newline
+    command.trim();                                // Remove any extra spaces or newline characters
 
-  delay(2000); // Wait before the next action
+    // Convert command to integer
+    int commandInt = command.toInt();
+    if (commandInt == 1)
+    {
+      Serial.println("Performing Happy Action...");
+      happyAction();
+      idle(); // Return to idle position after the action
+    }
+    else if (commandInt == 2)
+    {
+      Serial.println("Performing Say Hi Action...");
+      sayHi();
+      idle(); // Return to idle position after the action
+    }
+    else if (commandInt == 3)
+    {
+      Serial.println("Performing Pull up Action...");
+      pullUpAction();
+      idle(); // Return to idle position after the action
+    }
+    else
+    {
+      Serial.println("Unknown command. Returning to idle...");
+      idle();
+    }
+  }
+  else
+  {
+    idle(); // Keep the robot in the default idle state if no input
+  }
+
+  idle();
+}
+
+int calculatePulseLength(int angle)
+{
+  return map(angle, 0, 180, SERVOMIN, SERVOMAX);
 }
 
 void idle()
 {
   // Default positions for knees (standing position at 0°)
-  int kneeDefault = map(0, 0, 180, SERVOMIN, SERVOMAX);
+  // int kneeDefault = map(0, 0, 180, SERVOMIN, SERVOMAX);
+  int kneeDefault = calculatePulseLength(0);
   pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, kneeDefault);
   pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, kneeDefault);
   pwm.setPWM(BACK_LEFT_KNEE_CHANNEL, 0, kneeDefault);
   pwm.setPWM(BACK_RIGHT_KNEE_CHANNEL, 0, kneeDefault);
 
-  // Default positions for hips
-  int hipDefault1 = map(0, 0, 180, SERVOMIN, SERVOMAX);
-  int hipDefault2 = map(45, 0, 180, SERVOMIN, SERVOMAX);
-  pwm.setPWM(FRONT_LEFT_HIP_CHANNEL, 0, hipDefault1);  // 0 deg by default
-  pwm.setPWM(FRONT_RIGHT_HIP_CHANNEL, 0, hipDefault2); // 45 deg by default
-  pwm.setPWM(BACK_LEFT_HIP_CHANNEL, 0, hipDefault1);   // 0 deg by default
-  pwm.setPWM(BACK_RIGHT_HIP_CHANNEL, 0, hipDefault2);  // 45 deg by default
-}
+  // Default positions for hips (at 45°)
+  // int hipDefault = map(45, 0, 180, SERVOMIN, SERVOMAX);
+  int hipDefault = calculatePulseLength(45);
 
-void sayHi()
-{
-  int kneeMove = map(80, 0, 180, SERVOMIN, SERVOMAX); // Knee lifted position
-  int hipMove = map(45, 0, 180, SERVOMIN, SERVOMAX);  // Knee lifted position
+  pwm.setPWM(FRONT_LEFT_HIP_CHANNEL, 0, hipDefault);
+  pwm.setPWM(FRONT_RIGHT_HIP_CHANNEL, 0, hipDefault);
+  pwm.setPWM(BACK_LEFT_HIP_CHANNEL, 0, hipDefault);
+  pwm.setPWM(BACK_RIGHT_HIP_CHANNEL, 0, hipDefault);
 }
 
 void moveForward()
@@ -87,19 +112,25 @@ void moveForward()
 
 void pullUpAction()
 {
-  int frontKnee = map(0, 0, 180, SERVOMIN, SERVOMAX);
-  int backKnee = map(20, 0, 180, SERVOMIN, SERVOMAX);
+  // int frontKnee = map(0, 0, 180, SERVOMIN, SERVOMAX);
+  // int backKnee = map(20, 0, 180, SERVOMIN, SERVOMAX);
 
-  int backHip1 = map(0, 0, 180, SERVOMIN, SERVOMAX);
-  int backHip2 = map(45, 0, 180, SERVOMIN, SERVOMAX);
+  // int backHipLeft = map(90, 0, 180, SERVOMIN, SERVOMAX);
+  // int backHipRight = map(0, 0, 180, SERVOMIN, SERVOMAX);
+
+  int frontKnee = calculatePulseLength(0);
+  int backKnee = calculatePulseLength(20);
+
+  int backHipLeft = calculatePulseLength(90);
+  int backHipRight = calculatePulseLength(0);
 
   pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, frontKnee);
   pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, frontKnee);
   pwm.setPWM(BACK_LEFT_KNEE_CHANNEL, 0, backKnee);
   pwm.setPWM(BACK_RIGHT_KNEE_CHANNEL, 0, backKnee);
 
-  pwm.setPWM(BACK_LEFT_HIP_CHANNEL, 0, backHip2);
-  pwm.setPWM(BACK_RIGHT_HIP_CHANNEL, 0, backHip1);
+  pwm.setPWM(BACK_LEFT_HIP_CHANNEL, 0, backHipLeft);
+  pwm.setPWM(BACK_RIGHT_HIP_CHANNEL, 0, backHipRight);
 
   int pullUpCount = 0;
 
@@ -108,10 +139,16 @@ void pullUpAction()
   {
     for (int angle = 0; angle <= 45; angle++)
     {
-      int pulseLength = map(angle, 0, 180, SERVOMIN, SERVOMAX);
+      pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
+      pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
 
-      pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, pulseLength);
-      pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, pulseLength);
+      delay(20);
+    }
+
+    for (int angle = 45; angle >= 0; angle--)
+    {
+      pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
+      pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
 
       delay(20);
     }
@@ -123,14 +160,30 @@ void pullUpAction()
 void happyAction()
 {
   int kneeChannels[] = {FRONT_LEFT_KNEE_CHANNEL, FRONT_RIGHT_KNEE_CHANNEL, BACK_LEFT_KNEE_CHANNEL, BACK_RIGHT_KNEE_CHANNEL};
+  int count = 0;
 
-  for (int angle = 0; angle <= 45; angle++)
+  while (count <= 4)
   {
-    int pulseLength = map(angle, 0, 180, SERVOMIN, SERVOMAX);
-    for (int i = 0; i < 4; i++)
+    for (int angle = 0; angle <= 45; angle++)
     {
-      pwm.setPWM(kneeChannels[i], 0, pulseLength);
+      int pulseLength = calculatePulseLength(angle);
+      for (int i = 0; i < 4; i++)
+      {
+        pwm.setPWM(kneeChannels[i], 0, pulseLength);
+      }
+      delay(20);
     }
-    delay(20);
+
+    for (int angle = 45; angle >= 0; angle--)
+    {
+      int pulseLength = calculatePulseLength(angle);
+      for (int i = 0; i < 4; i++)
+      {
+        pwm.setPWM(kneeChannels[i], 0, pulseLength);
+      }
+      delay(20);
+    }
+
+    count++;
   }
 }

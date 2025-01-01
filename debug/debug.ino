@@ -10,8 +10,11 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 #define SERVOMIN 150 // Minimum pulse length for 0°
 #define SERVOMAX 600 // Maximum pulse length for 180°
 
-#define SERVO1_CHANNEL 0 // Servo 1 on Channel 0
-#define SERVO2_CHANNEL 1 // Servo 2 on Channel 1
+#define FRONT_LEFT_HIP_CHANNEL 0  // Inner servo for the front-left leg
+#define FRONT_LEFT_KNEE_CHANNEL 1 // Outer servo for the front-left leg
+
+#define FRONT_RIGHT_HIP_CHANNEL 2  // Inner servo for the front-right leg
+#define FRONT_RIGHT_KNEE_CHANNEL 3 // Outer servo for the front-right leg
 
 void setup()
 {
@@ -45,12 +48,12 @@ void loop()
 
       if (servoNumber == 1)
       {
-        pwm.setPWM(SERVO1_CHANNEL, 0, pulseLength); // Set Servo 1
+        pwm.setPWM(FRONT_LEFT_HIP_CHANNEL, 0, pulseLength); // Set Servo 1
         Serial.print("Servo 1 moved to ");
       }
       else if (servoNumber == 2)
       {
-        pwm.setPWM(SERVO2_CHANNEL, 0, pulseLength); // Set Servo 2
+        pwm.setPWM(FRONT_RIGHT_HIP_CHANNEL, 0, pulseLength); // Set Servo 2
         Serial.print("Servo 2 moved to ");
       }
       Serial.print(angle);
