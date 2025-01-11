@@ -3,7 +3,7 @@
 
 // GPIO A4 → SDA
 // GPIO A5  → SCL
-
+// test update new code   
 // Create an instance of the PCA9685 driver
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 
