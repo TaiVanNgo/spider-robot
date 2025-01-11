@@ -1,8 +1,8 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
-// GPIO 21 → SDA
-// GPIO 22 → SCL
+// GPIO A4 → SDA
+// GPIO A5  → SCL
 
 // Create an instance of the PCA9685 driver
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
@@ -26,7 +26,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Spider Robot Initialized. Type 'happy' to perform the happy action.");
 
   // Initialize PCA9685
@@ -55,7 +55,7 @@ void loop()
     else if (commandInt == 2)
     {
       Serial.println("Performing Say Hi Action...");
-      sayHi();
+      // sayHi();
       idle(); // Return to idle position after the action
     }
     else if (commandInt == 3)
