@@ -249,14 +249,81 @@ void moveForward()
 // #define BACK_RIGHT_HIP_CHANNEL 6  // Inner servo for the back-right leg
 // #define BACK_RIGHT_KNEE_CHANNEL 7 // Outer servo for the back-right leg
 
+  // Step 1: Lifting (front-left & back-right knees)
+  int kneePosition = 30;
+  setServo(1, kneePosition);
+  setServo(7, kneePosition);
+
+  kneePosition = 20;
+  setServo(3, kneePosition);
+  setServo(5, kneePosition);
+
+  // Step 2: Stepping (front-left & back-right hips)
+  for (int angle = 45; angle <= 90; angle++){
+    //front-left hip goes from 45 to 90
+    setServo(0, angle); 
+
+    // back-right hip goes from 45 to 0
+    int angle2 = 90 - angle; 
+    setServo(6, angle2); 
+
+    delay(20);
+  }
+
+  // Step 3: Landing (front-left & back-right knees), reset all knees to default position
+  kneePosition = 45;
+  setMultipleServos(KNEE_CHANNELS, 4, kneePosition);
+
+  // Step 4: Reset (return to intial states for hips)
+  for (int angle = 90; angle >= 45; angle--){
+    //front-left hip goes from 90 to 45
+    setServo(0, angle); 
+
+    // back-right hip goes from 0 to 45
+    int angle2 = 90 - angle; 
+    setServo(6, angle2); 
+
+    delay(20);
+  }
+
+  // Step 5: Lifting (Front-right and back-left knees)
+  kneePosition = 60;
+  setServo(3, kneePosition);
+  setServo(5, kneePosition);
+ 
+
+  int kneePosition = 70;
+  setServo(1, kneePosition);
+  setServo(7, kneePosition);
   
-  setServo(5,60);
-  for (int angle = 45; angle >= 20; angle--){
-    setServo(4, angle);
+  // Step 6: Stepping (Front-right and Back-Left hips)
+  for (int angle = 45; angle <= 90; angle++){
+    //front-right hip goes from 45 to 90
+    setServo(2, angle); 
+
+    // back-left hip goes from 45 to 0
+    int angle2 = 90 - angle; 
+    setServo(4, angle2); 
+
+    delay(20);
   }
 
 
-delay(1000);
+  // Step 7: Landing (front-right & back-left knees)
+  kneePosition = 45;
+  setMultipleServos(KNEE_CHANNELS, 4, kneePosition);
+
+  // Step 8: Reset (return to intial states for hips, the move done)
+  for (int angle = 90; angle >= 45; angle--){
+    //front-right hip goes from 90 to 45
+    setServo(2, angle); 
+
+    // back-left hip goes from 0 to 45
+    int angle2 = 90 - angle; 
+    setServo(4, angle2); 
+
+    delay(20);
+  }
 
 
 // for (int angle = 45; angle <= 60; angle++)
