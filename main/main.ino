@@ -3,7 +3,7 @@
 
 // GPIO A4 → SDA
 // GPIO A5  → SCL
-// test update new code
+
 // Create an instance of the PCA9685 driver
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
 
@@ -67,14 +67,15 @@ void loop()
     }
     else if (commandInt == 2)
     {
-      Serial.println("Performing Say Hi Action...");
+      Serial.println("Performing Defense Action...");
       // sayHiAction();
+      defenseAction();
       idle(); // Return to idle position after the action
     }
     else if (commandInt == 3)
     {
       Serial.println("Performing Pull up Action...");
-      // pullUpAction();
+      pullUpAction();
       idle(); // Return to idle position after the action
     }
     else if (commandInt == 4)
@@ -82,11 +83,17 @@ void loop()
       Serial.println("Performing turn left Action...");
       turnLeft();
       idle(); // Return to idle position after the action
-    }     
+    }
     else if (commandInt == 5)
     {
-      Serial.println("Performing turn move forward...");
+      Serial.println("Performing move forward...");
       moveForward();
+      idle(); // Return to idle position after the action
+    }
+    else if (commandInt == 6)
+    {
+      Serial.println("Performing turn right...");
+      turnRight();
       idle(); // Return to idle position after the action
     }
     else
@@ -117,20 +124,6 @@ void setMultipleServos(const int channels[], int numChannels, int deg)
     pwm.setPWM(channels[i], 0, pulseLength);
   }
 }
-
-// void moveServoGroup(const int channels[], int numChannels, int startAngle, int endAngle, int step, int delayMs)
-// {
-
-//   for (int angle = startAngle; angle != endAngle; angle += step)
-//   {
-//     int pulseLength = calculatePulseLength(angle);
-//     for (int i = 0; i < numChannels; i++)
-//     {
-//       pwm.setPWM(channels[i], 0, pulseLength);
-//     }
-//     delay(delayMs);
-//   }
-// }
 
 void setServo(int servoNum, int deg)
 {
@@ -191,6 +184,50 @@ void turnLeft()
   }
 }
 
+void turnRight()
+{
+  int position = 55;
+
+  setMultipleServos(KNEE_CHANNELS, 4, position);
+
+  for (int angle = 45; angle >= 0; angle -= 5)
+  {
+    // Move front-right hip and back-left hip from 45deg to 0deg
+    setServo(2, angle); // front-right hip
+    setServo(4, angle); // back-left hip
+
+    delay(20);
+  }
+
+  int position2 = 30;
+  setMultipleServos(KNEE_CHANNELS, 4, position2);
+
+  for (int angle = 45; angle >= 0; angle -= 5)
+  {
+    int angle2 = 45 - angle; // Calculate angle2 to go from 0 to 45
+
+    setServo(0, angle);
+    setServo(6, angle);
+
+    setServo(2, angle2); // set front-left hip from 0 to 45
+    setServo(4, angle2); // set back-right hip from 0 to 45
+
+    delay(20);
+  }
+
+  int position3 = 55;
+  setMultipleServos(KNEE_CHANNELS, 4, position3);
+
+  for (int angle = 0; angle <= 45; angle += 5)
+  {
+    // set front-left hip and back-right hip from 90deg to 45deg (default position)
+    setServo(0, angle);
+    setServo(6, angle);
+
+    delay(20);
+  }
+}
+
 void happyAction()
 {
   int count = 0;
@@ -237,14 +274,16 @@ void happyAction()
   }
 }
 
-void moveForward(){
-  // Step 1: back-left knee rising 
-  int kneePosition = 60;
+void moveForward()
+{
+  // Step 1: back-left knee rising
+  int kneePosition = 55;
   setServo(3, kneePosition);
   // setServo(5, kneePosition);
 
   // move back-left hip from 45 to 0 deg
-  for(int angle = 45; angle >= 0; angle-=3){
+  for (int angle = 45; angle >= 0; angle -= 4)
+  {
     setServo(4, angle);
 
     // Calculate angle2 to go from 45 to 60
@@ -257,34 +296,35 @@ void moveForward(){
   }
 
   // standing back-left knee
-  kneePosition = 30;
-  setServo(5,kneePosition);
+  kneePosition = 35;
+  setServo(5, kneePosition);
   setServo(3, kneePosition);
 
-  setServo(7, 30);
+  setServo(7, 35);
 
-  for(int angle = 45; angle >= 0; angle -=3){
+  for (int angle = 45; angle >= 0; angle -= 4)
+  {
     setServo(2, angle);
 
-     // Calculate angle2 going from 0 to 45
-    int angle2 = 45 - angle; 
-    setServo(4, angle2); 
+    // Calculate angle2 going from 0 to 45
+    int angle2 = 45 - angle;
+    setServo(4, angle2);
 
     // Calculate angle3 going from 45 to 90
-    int angle3 = 90 - angle; 
-    setServo(6, angle3); 
+    int angle3 = 90 - angle;
+    setServo(6, angle3);
 
     delay(20);
   }
 
   // raise front right knee
-  kneePosition = 60;  
+  kneePosition = 55;
   setServo(3, kneePosition);
   setServo(5, kneePosition);
   setServo(7, 45);
 
-
-  for(int angle = 0; angle <= 45; angle+=3){
+  for (int angle = 0; angle <= 45; angle += 4)
+  {
     setServo(2, angle);
 
     delay(20);
@@ -293,116 +333,16 @@ void moveForward(){
   setServo(1, 55);
   setServo(7, 55);
 
-  for(int angle = 45; angle <= 90; angle+=3){
+  for (int angle = 45; angle <= 90; angle += 4)
+  {
     setServo(0, angle);
 
     // Calculate angle2 going from 90 to 45
-    int angle2 = 135 - angle;   
+    int angle2 = 135 - angle;
     setServo(6, angle2);
     delay(20);
   }
-  // setServo(1, 45);
-  // setServo(3,45);
-  // setServo(5, 45);
-  // setServo(7,45);
-
-  // for(int angle = 90; angle >= 45; angle--){
-  //   setServo(0, angle);
-  //   delay(20);
-  // }
-}
-
-// void moveForward()
-// {
-
-// // #define FRONT_LEFT_HIP_CHANNEL 0  // Inner servo for the front-left leg
-// // #define FRONT_LEFT_KNEE_CHANNEL 1 // Outer servo for the front-left leg
-// // #define FRONT_RIGHT_HIP_CHANNEL 2  // Inner servo for the front-right leg
-// // #define FRONT_RIGHT_KNEE_CHANNEL 3 // Outer servo for the front-right leg
-// // #define BACK_LEFT_HIP_CHANNEL 4  // Inner servo for the back-left leg
-// // #define BACK_LEFT_KNEE_CHANNEL 5 // Outer servo for the back-left leg
-// // #define BACK_RIGHT_HIP_CHANNEL 6  // Inner servo for the back-right leg
-// // #define BACK_RIGHT_KNEE_CHANNEL 7 // Outer servo for the back-right leg
-
-//   // Step 1: Lifting (front-left & back-right knees)
-//   int kneePosition = 30;
-//   setServo(1, kneePosition);
-//   setServo(7, kneePosition);
-
-//   kneePosition = 20;
-//   setServo(3, kneePosition);
-//   setServo(5, kneePosition);
-
-//   // Step 2: Stepping (front-left & back-right hips)
-//   for (int angle = 45; angle <= 90; angle+=5){
-//     //front-left hip goes from 45 to 90
-//     setServo(0, angle); 
-
-//     // back-right hip goes from 45 to 0
-//     int angle2 = 90 - angle; 
-//     setServo(6, angle2); 
-
-//     delay(20);
-//   }
-
-//   // Step 3: Landing (front-left & back-right knees)
-//   kneePosition = 75;
-//   setServo(1, kneePosition);
-//   setServo(7, kneePosition);
-//   // setMultipleServos(KNEE_CHANNELS, 4, kneePosition);
-
-//   // Step 4: Reset (return to intial states for hips)
-//   for (int angle = 90; angle >= 45; angle-=5){
-//     //front-left hip goes from 90 to 45
-//     setServo(0, angle); 
-
-//     // back-right hip goes from 0 to 45
-//     int angle2 = 90 - angle; 
-//     setServo(6, angle2); 
-
-//     delay(20);
-//   }
-
-//   // Step 5: Lifting (Front-right and back-left knees)
-//   kneePosition = 60;
-//   setServo(3, kneePosition);
-//   setServo(5, kneePosition);
- 
-//   // kneePosition = 70;
-//   // setServo(1, kneePosition);
-//   // setServo(7, kneePosition);
-  
-//   // Step 6: Stepping (Front-right and Back-Left hips)
-//   for (int angle = 45; angle <= 90; angle+=5){
-//     //front-right hip goes from 45 to 90
-//     setServo(2, angle); 
-
-//     // back-left hip goes from 45 to 0
-//     int angle2 = 90 - angle; 
-//     setServo(4, angle2); 
-
-//     delay(20);
-//   }
-
-//   // Step 7: Landing (front-right & back-left knees)
-//   kneePosition = 20;
-//   setServo(3, kneePosition);
-//   setServo(5, kneePosition);
-//   // setMultipleServos(KNEE_CHANNELS, 4, kneePosition);
-
-//   // Step 8: Reset (return to intial states for hips, the move done)
-//   for (int angle = 90; angle >= 45; angle-=5){
-//     //front-right hip goes from 90 to 45
-//     setServo(2, angle); 
-
-//     // back-left hip goes from 0 to 45
-//     int angle2 = 90 - angle; 
-//     setServo(4, angle2); 
-
-//     delay(20);
-//   }
-
-// }
+};
 
 // void sayHiAction()
 // {
@@ -462,43 +402,89 @@ void moveForward(){
 
 // }
 
-// void pullUpAction()
-// {
-//   int frontKnee = calculatePulseLength(0);
-//   int backKnee = calculatePulseLength(0);
+void defenseAction(){
+  for(int angle = 45; angle <= 60; angle ++){
+    setServo(3, angle);
+    setServo(5, angle);
 
-//   int backHipLeft = calculatePulseLength(90);
-//   int backHipRight = calculatePulseLength(0);
+    int angle2 = 90 - angle;
+    setServo(1, angle2);
+    setServo(7, angle2);
 
-//   pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, frontKnee);
-//   pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, frontKnee);
-//   pwm.setPWM(BACK_LEFT_KNEE_CHANNEL, 0, backKnee);
-//   pwm.setPWM(BACK_RIGHT_KNEE_CHANNEL, 0, backKnee);
 
-//   pwm.setPWM(BACK_LEFT_HIP_CHANNEL, 0, backHipLeft);
-//   pwm.setPWM(BACK_RIGHT_HIP_CHANNEL, 0, backHipRight);
+    delay(20);
+  }
 
-//   int pullUpCount = 0;
+  for(int angle = 60; angle >= 30; angle--){
+    setServo(3, angle);
+    setServo(5, angle);
 
-//   // pull up 3 reps
-//   while (pullUpCount < 3)
-//   {
-//     for (int angle = 0; angle <= 45; angle++)
-//     {
-//       pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
-//       pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
+    int angle2 = 90 - angle;
+    setServo(1, angle2);
+    setServo(7, angle2);
 
-//       delay(20);
-//     }
+    delay(20);
+  }
 
-//     for (int angle = 45; angle >= 0; angle--)
-//     {
-//       pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
-//       pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
+  for(int angle = 45; angle <= 90; angle+=2){
+    setServo(2, angle);
+    setServo(4, angle);
 
-//       delay(20);
-//     }
+    int angle2 = 90 - angle;
+    setServo(0, angle2);
+    setServo(6, angle2);
 
-//     pullUpCount++;
-//   }
-// }
+    delay(20);
+  }
+
+
+  delay(1000);
+}
+
+void pullUpAction()
+{
+  int backLeftKneesPos = 35;
+  int backRightKneePos = 55;
+
+  setServo(5, backLeftKneesPos);
+  setServo(7, backRightKneePos);
+
+  for (int angle = 45; angle <= 90; angle++)
+  {
+    setServo(4, angle); // move back-left hip from 45 to 90
+
+    int angle2 = 90 - angle; // angle2 goes from 45 to 0
+    setServo(6, angle2);     // move back-right hip from 45 to 0
+    delay(20);
+  }
+
+  int pullUpCount = 0;
+
+  // do 3 pull up
+  while (pullUpCount <= 3)
+  {
+    for (int angle = 45; angle >= 10; angle--)
+    {
+      setServo(1, angle); // set front-left knee goes from 45 to 10
+
+      int angle2 = 90 - angle; // Calculate angle2 to go from 45 to 80
+      setServo(3, angle2);     // set front-right knee goes from 45 to 80
+
+      delay(20);
+    }
+
+    for (int angle = 10; angle <= 45; angle++)
+    {
+      setServo(1, angle); // set front-left knee goes from 10 to 45
+
+      int angle2 = 90 - angle; // Calculate angle2 to go from 80 to 45
+      setServo(3, angle2);     // set front-right knee goes from 80 to 45
+
+      delay(20);
+    }
+
+    delay(10);
+
+    pullUpCount++;
+  }
+}
