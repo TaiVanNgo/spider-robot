@@ -13,7 +13,7 @@ PCA9685 Setup:
 */
 
 // setup for bluetooth module
-// SoftwareSerial mySerial(4, 5); // RX, TX
+SoftwareSerial mySerial(4, 5); // RX, TX
 
 
 // Create an instance of the PCA9685 driver
@@ -52,8 +52,8 @@ const int HIP_CHANNELS[] = {FRONT_LEFT_HIP_CHANNEL, FRONT_RIGHT_HIP_CHANNEL, BAC
 void setup()
 {
   Serial.begin(9600);
-  // mySerial.begin(115200); // JDY-3 3 Default Baud Rate
-  Dabble.begin(115200, 8, 9);
+  mySerial.begin(9600); // JDY-3 3 Default Baud Rate
+  Dabble.begin(mySerial);
 
   Serial.println("Spider Robot Initialized. Enter 1-6 to control spider");
 
@@ -64,65 +64,65 @@ void setup()
   idle();
 }
 
-void loop() {
-  Dabble.processInput();  // Read Bluetooth data
-  Serial.println("TEST: \n");
-  if (GamePad.isUpPressed()) {
-    Serial.println("Up button pressed!");
-  }
-  if (GamePad.isDownPressed()) {
-    Serial.println("Down button pressed!");
-  }
-  if (GamePad.isLeftPressed()) {
-    Serial.println("Left button pressed!");
-  }
-  if (GamePad.isRightPressed()) {
-    Serial.println("Right button pressed!");
-  }
-  if (GamePad.isCirclePressed()) {
-    Serial.println("Circle button pressed!");
-  }
-  if (GamePad.isCrossPressed()) {
-    Serial.println("Cross button pressed!");
-  }
-  if (GamePad.isTrianglePressed()) {
-    Serial.println("Triangle button pressed!");
-  }
-  if (GamePad.isSquarePressed()) {
-    Serial.println("Square button pressed!");
-  }
-}
 // void loop() {
-//   Dabble.processInput(); // Process Dabble inputs
-
+//   Dabble.processInput();  // Read Bluetooth data
+//   Serial.println("TEST: \n");
 //   if (GamePad.isUpPressed()) {
-//     Serial.println("Moving Forward...");
-//     moveForward();
+//     Serial.println("Up button pressed!");
+//   }
+//   if (GamePad.isDownPressed()) {
+//     Serial.println("Down button pressed!");
 //   }
 //   if (GamePad.isLeftPressed()) {
-//     Serial.println("Turning Left...");
-//     turnLeft();
+//     Serial.println("Left button pressed!");
 //   }
 //   if (GamePad.isRightPressed()) {
-//     Serial.println("Turning Right...");
-//     turnRight();
-//   }
-//   if (GamePad.isTrianglePressed()) {
-//     Serial.println("Happy Action!");
-//     happyAction();
-//   }
-//   if (GamePad.isCrossPressed()) {
-//     Serial.println("Defense Mode!");
-//     defenseAction();
+//     Serial.println("Right button pressed!");
 //   }
 //   if (GamePad.isCirclePressed()) {
-//     Serial.println("Pull Up Action!");
-//     pullUpAction();
+//     Serial.println("Circle button pressed!");
 //   }
-  
-//   // Default to idle when no input is detected
-//   idle();
+//   if (GamePad.isCrossPressed()) {
+//     Serial.println("Cross button pressed!");
+//   }
+//   if (GamePad.isTrianglePressed()) {
+//     Serial.println("Triangle button pressed!");
+//   }
+//   if (GamePad.isSquarePressed()) {
+//     Serial.println("Square button pressed!");
+//   }
 // }
+void loop() {
+  Dabble.processInput(); // Process Dabble inputs
+
+  if (GamePad.isUpPressed()) {
+    Serial.println("Moving Forward...");
+    moveForward();
+  }
+  if (GamePad.isLeftPressed()) {
+    Serial.println("Turning Left...");
+    turnLeft();
+  }
+  if (GamePad.isRightPressed()) {
+    Serial.println("Turning Right...");
+    turnRight();
+  }
+  if (GamePad.isTrianglePressed()) {
+    Serial.println("Happy Action!");
+    happyAction();
+  }
+  if (GamePad.isCrossPressed()) {
+    Serial.println("Defense Mode!");
+    defenseAction();
+  }
+  if (GamePad.isCirclePressed()) {
+    Serial.println("Pull Up Action!");
+    pullUpAction();
+  }
+  
+  // Default to idle when no input is detected
+  idle();
+}
 
 // void loop()
 // {
