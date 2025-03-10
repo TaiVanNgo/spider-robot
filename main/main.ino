@@ -1,8 +1,19 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
+#include <Dabble.h>
+#include <SoftwareSerial.h>
+/*
+Module Bluetooth 3.0 SPP / BLE 4.2 Dual Mode JDY-33 setup:
+  - module TX -> nano D4
+  - module RX -> nano D5
 
-// GPIO A4 → SDA
-// GPIO A5  → SCL
+PCA9685 Setup:
+  - GPIO A4 → SDA
+  - GPIO A5  → SCL
+*/
+
+// setup for bluetooth module
+SoftwareSerial mySerial(4, 5); // RX, TX
 
 // Create an instance of the PCA9685 driver
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40);
@@ -40,7 +51,10 @@ const int HIP_CHANNELS[] = {FRONT_LEFT_HIP_CHANNEL, FRONT_RIGHT_HIP_CHANNEL, BAC
 void setup()
 {
   Serial.begin(9600);
-  Serial.println("Spider Robot Initialized. Type 'happy' to perform the happy action.");
+  mySerial.begin(9600); // JDY-3 3 Default Baud Rate
+  Dabble.begin(mySerial);
+
+  Serial.println("Spider Robot Initialized. Enter 1-6 to control spider");
 
   // Initialize PCA9685
   pwm.begin();
@@ -49,66 +63,133 @@ void setup()
   idle();
 }
 
+// void loop() {
+//   Dabble.processInput();  // Read Bluetooth data
+//   Serial.println("TEST: \n");
+//   if (GamePad.isUpPressed()) {
+//     Serial.println("Up button pressed!");
+//   }
+//   if (GamePad.isDownPressed()) {
+//     Serial.println("Down button pressed!");
+//   }
+//   if (GamePad.isLeftPressed()) {
+//     Serial.println("Left button pressed!");
+//   }
+//   if (GamePad.isRightPressed()) {
+//     Serial.println("Right button pressed!");
+//   }
+//   if (GamePad.isCirclePressed()) {
+//     Serial.println("Circle button pressed!");
+//   }
+//   if (GamePad.isCrossPressed()) {
+//     Serial.println("Cross button pressed!");
+//   }
+//   if (GamePad.isTrianglePressed()) {
+//     Serial.println("Triangle button pressed!");
+//   }
+//   if (GamePad.isSquarePressed()) {
+//     Serial.println("Square button pressed!");
+//   }
+// }
 void loop()
 {
-  // Check for user input from Serial Monitor
-  if (Serial.available())
-  {
-    String command = Serial.readStringUntil('\n'); // Read user input until newline
-    command.trim();                                // Remove any extra spaces or newline characters
+  Dabble.processInput(); // Process Dabble inputs
 
-    // Convert command to integer
-    int commandInt = command.toInt();
-    if (commandInt == 1)
-    {
-      Serial.println("Performing Happy Action...");
-      happyAction();
-      idle(); // Return to idle position after the action
-    }
-    else if (commandInt == 2)
-    {
-      Serial.println("Performing Defense Action...");
-      // sayHiAction();
-      defenseAction();
-      idle(); // Return to idle position after the action
-    }
-    else if (commandInt == 3)
-    {
-      Serial.println("Performing Pull up Action...");
-      pullUpAction();
-      idle(); // Return to idle position after the action
-    }
-    else if (commandInt == 4)
-    {
-      Serial.println("Performing turn left Action...");
-      turnLeft();
-      idle(); // Return to idle position after the action
-    }
-    else if (commandInt == 5)
-    {
-      Serial.println("Performing move forward...");
-      moveForward();
-      idle(); // Return to idle position after the action
-    }
-    else if (commandInt == 6)
-    {
-      Serial.println("Performing turn right...");
-      turnRight();
-      idle(); // Return to idle position after the action
-    }
-    else
-    {
-      Serial.println("Unknown command. Returning to idle...");
-      idle();
-    }
-  }
-  else
+  if (GamePad.isUpPressed())
   {
-    idle(); // Keep the robot in the default idle state if no input
+    Serial.println("Moving Forward...");
+    moveForward();
+  }
+  if (GamePad.isLeftPressed())
+  {
+    Serial.println("Turning Left...");
+    turnLeft();
+  }
+  if (GamePad.isRightPressed())
+  {
+    Serial.println("Turning Right...");
+    turnRight();
+  }
+  if (GamePad.isTrianglePressed())
+  {
+    Serial.println("Happy Action!");
+    happyAction();
+  }
+  if (GamePad.isCrossPressed())
+  {
+    Serial.println("Defense Mode!");
+    defenseAction();
+  }
+  if (GamePad.isCirclePressed())
+  {
+    Serial.println("Pull Up Action!");
+    pullUpAction();
   }
 
+  // Default to idle when no input is detected
   idle();
 }
+
+// void loop()
+// {
+//   // Check for user input from Serial Monitor
+//   if (Serial.available())
+//   {
+//     String command = Serial.readStringUntil('\n'); // Read user input until newline
+//     command.trim();                                // Remove any extra spaces or newline characters
+
+//     // Convert command to integer
+//     int commandInt = command.toInt();
+//     if (commandInt == 1)
+//     {
+//       Serial.println("Performing Happy Action...");
+//       happyAction();
+//       idle(); // Return to idle position after the action
+//     }
+//     else if (commandInt == 2)
+//     {
+//       Serial.println("Performing Defense Action...");
+//       // sayHiAction();
+//       defenseAction();
+//       idle(); // Return to idle position after the action
+//     }
+//     else if (commandInt == 3)
+//     {
+//       Serial.println("Performing Pull up Action...");
+//       pullUpAction();
+//       idle(); // Return to idle position after the action
+//     }
+//     else if (commandInt == 4)
+//     {
+//       Serial.println("Performing turn left Action...");
+//       turnLeft();
+//       idle(); // Return to idle position after the action
+//     }
+//     else if (commandInt == 5)
+//     {
+//       Serial.println("Performing move forward...");
+//       moveForward();
+//       idle(); // Return to idle position after the action
+//     }
+//     else if (commandInt == 6)
+//     {
+//       Serial.println("Performing turn right...");
+//       turnRight();
+//       idle(); // Return to idle position after the action
+//     }
+//     else
+//     {
+//       Serial.println("Unknown command. Returning to idle...");
+//       idle();
+//     }
+//   }
+//   else
+//   {
+//     idle(); // Keep the robot in the default idle state if no input
+//   }
+
+//   idle();
+// }
 
 int calculatePulseLength(int angle)
 {
@@ -282,7 +363,7 @@ void moveForward()
   // setServo(5, kneePosition);
 
   // move back-left hip from 45 to 0 deg
-  for (int angle = 45; angle >= 0; angle -= 4)
+  for (int angle = 45; angle >= 0; angle -= 5)
   {
     setServo(4, angle);
 
@@ -302,7 +383,7 @@ void moveForward()
 
   setServo(7, 35);
 
-  for (int angle = 45; angle >= 0; angle -= 4)
+  for (int angle = 45; angle >= 0; angle -= 5)
   {
     setServo(2, angle);
 
@@ -323,7 +404,7 @@ void moveForward()
   setServo(5, kneePosition);
   setServo(7, 45);
 
-  for (int angle = 0; angle <= 45; angle += 4)
+  for (int angle = 0; angle <= 45; angle += 5)
   {
     setServo(2, angle);
 
@@ -333,7 +414,7 @@ void moveForward()
   setServo(1, 55);
   setServo(7, 55);
 
-  for (int angle = 45; angle <= 90; angle += 4)
+  for (int angle = 45; angle <= 90; angle += 5)
   {
     setServo(0, angle);
 
@@ -344,78 +425,10 @@ void moveForward()
   }
 };
 
-// void sayHiAction()
-// {
-//   int frontKnees = calculatePulseLength(0);
-
-//   int backKnees = calculatePulseLength(0);
-
-//   int backHipLeft = calculatePulseLength(45);
-//   int backHipRight = calculatePulseLength(45);
-
-//   pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, frontKnees);
-//   pwm.setPWM(FRONT_RIGHT_KNEE_CHANNEL, 0, frontKnees);
-//   pwm.setPWM(BACK_LEFT_KNEE_CHANNEL, 0, backKnees);
-//   pwm.setPWM(BACK_RIGHT_KNEE_CHANNEL, 0, backKnees);
-
-//   pwm.setPWM(BACK_LEFT_HIP_CHANNEL, 0, backHipLeft);
-//   pwm.setPWM(BACK_RIGHT_HIP_CHANNEL, 0, backHipRight);
-
-//   // let the back knees down
-//   for (int angle = 0; angle <= 45; angle++)
-//   {
-//     pwm.setPWM(BACK_LEFT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
-//     pwm.setPWM(BACK_RIGHT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
-
-//     delay(20);
-//   }
-
-//   for (int angle = 45; angle <= 90; angle++)
-//   {
-//     pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
-//     delay(20);
-//   }
-
-//   for (int angle = 90; angle >= 45; angle--)
-//   {
-//     pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
-//     delay(20);
-//   }
-
-//   for (int angle = 45; angle <= 90; angle++)
-//   {
-//     pwm.setPWM(FRONT_LEFT_KNEE_CHANNEL, 0, calculatePulseLength(angle));
-//     delay(20);
-//   }
-
-//   for (int angle = 45; angle >= 0; angle--)
-//   {
-//     pwm.setPWM(FRONT_LEFT_HIP_CHANNEL, 0, calculatePulseLength(angle));
-//     delay(20);
-//   }
-
-//   for (int angle = 0; angle <= 45; angle++)
-//   {
-//     pwm.setPWM(FRONT_LEFT_HIP_CHANNEL, 0, calculatePulseLength(angle));
-//     delay(20);
-//   }
-
-// }
-
-void defenseAction(){
-  for(int angle = 45; angle <= 60; angle ++){
-    setServo(3, angle);
-    setServo(5, angle);
-
-    int angle2 = 90 - angle;
-    setServo(1, angle2);
-    setServo(7, angle2);
-
-
-    delay(20);
-  }
-
-  for(int angle = 60; angle >= 30; angle--){
+void defenseAction()
+{
+  for (int angle = 45; angle <= 60; angle++)
+  {
     setServo(3, angle);
     setServo(5, angle);
 
@@ -426,7 +439,20 @@ void defenseAction(){
     delay(20);
   }
 
-  for(int angle = 45; angle <= 90; angle+=2){
+  for (int angle = 60; angle >= 30; angle--)
+  {
+    setServo(3, angle);
+    setServo(5, angle);
+
+    int angle2 = 90 - angle;
+    setServo(1, angle2);
+    setServo(7, angle2);
+
+    delay(20);
+  }
+
+  for (int angle = 45; angle <= 90; angle += 2)
+  {
     setServo(2, angle);
     setServo(4, angle);
 
@@ -436,7 +462,6 @@ void defenseAction(){
 
     delay(20);
   }
-
 
   delay(1000);
 }
@@ -449,7 +474,7 @@ void pullUpAction()
   setServo(5, backLeftKneesPos);
   setServo(7, backRightKneePos);
 
-  for (int angle = 45; angle <= 90; angle++)
+  for (int angle = 45; angle <= 90; angle += 2)
   {
     setServo(4, angle); // move back-left hip from 45 to 90
 
@@ -463,7 +488,7 @@ void pullUpAction()
   // do 3 pull up
   while (pullUpCount <= 3)
   {
-    for (int angle = 45; angle >= 10; angle--)
+    for (int angle = 45; angle >= 10; angle -= 2)
     {
       setServo(1, angle); // set front-left knee goes from 45 to 10
 
@@ -473,7 +498,7 @@ void pullUpAction()
       delay(20);
     }
 
-    for (int angle = 10; angle <= 45; angle++)
+    for (int angle = 10; angle <= 45; angle += 2)
     {
       setServo(1, angle); // set front-left knee goes from 10 to 45
 
