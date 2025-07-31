@@ -63,34 +63,6 @@ void setup()
   idle();
 }
 
-// void loop() {
-//   Dabble.processInput();  // Read Bluetooth data
-//   Serial.println("TEST: \n");
-//   if (GamePad.isUpPressed()) {
-//     Serial.println("Up button pressed!");
-//   }
-//   if (GamePad.isDownPressed()) {
-//     Serial.println("Down button pressed!");
-//   }
-//   if (GamePad.isLeftPressed()) {
-//     Serial.println("Left button pressed!");
-//   }
-//   if (GamePad.isRightPressed()) {
-//     Serial.println("Right button pressed!");
-//   }
-//   if (GamePad.isCirclePressed()) {
-//     Serial.println("Circle button pressed!");
-//   }
-//   if (GamePad.isCrossPressed()) {
-//     Serial.println("Cross button pressed!");
-//   }
-//   if (GamePad.isTrianglePressed()) {
-//     Serial.println("Triangle button pressed!");
-//   }
-//   if (GamePad.isSquarePressed()) {
-//     Serial.println("Square button pressed!");
-//   }
-// }
 void loop()
 {
   Dabble.processInput(); // Process Dabble inputs
@@ -129,67 +101,6 @@ void loop()
   // Default to idle when no input is detected
   idle();
 }
-
-// void loop()
-// {
-//   // Check for user input from Serial Monitor
-//   if (Serial.available())
-//   {
-//     String command = Serial.readStringUntil('\n'); // Read user input until newline
-//     command.trim();                                // Remove any extra spaces or newline characters
-
-//     // Convert command to integer
-//     int commandInt = command.toInt();
-//     if (commandInt == 1)
-//     {
-//       Serial.println("Performing Happy Action...");
-//       happyAction();
-//       idle(); // Return to idle position after the action
-//     }
-//     else if (commandInt == 2)
-//     {
-//       Serial.println("Performing Defense Action...");
-//       // sayHiAction();
-//       defenseAction();
-//       idle(); // Return to idle position after the action
-//     }
-//     else if (commandInt == 3)
-//     {
-//       Serial.println("Performing Pull up Action...");
-//       pullUpAction();
-//       idle(); // Return to idle position after the action
-//     }
-//     else if (commandInt == 4)
-//     {
-//       Serial.println("Performing turn left Action...");
-//       turnLeft();
-//       idle(); // Return to idle position after the action
-//     }
-//     else if (commandInt == 5)
-//     {
-//       Serial.println("Performing move forward...");
-//       moveForward();
-//       idle(); // Return to idle position after the action
-//     }
-//     else if (commandInt == 6)
-//     {
-//       Serial.println("Performing turn right...");
-//       turnRight();
-//       idle(); // Return to idle position after the action
-//     }
-//     else
-//     {
-//       Serial.println("Unknown command. Returning to idle...");
-//       idle();
-//     }
-//   }
-//   else
-//   {
-//     idle(); // Keep the robot in the default idle state if no input
-//   }
-
-//   idle();
-// }
 
 int calculatePulseLength(int angle)
 {
