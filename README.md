@@ -10,7 +10,13 @@ A four-legged spider robot powered by an Arduino Nano. This project utilizes a P
 
 ## Demo
 
-Here are some images and GIFs of the spider robot in action:
+Here are some images, GIFs, and videos of the spider robot in action:
+
+**Video Demo:**
+
+[![Spider Robot Demo](https://img.youtube.com/vi/b6UyXEHXSpQ/0.jpg)](https://www.youtube.com/watch?v=b6UyXEHXSpQ)
+
+*Click the image above to watch the full demonstration video on YouTube.*
 
 **Example:**
 
