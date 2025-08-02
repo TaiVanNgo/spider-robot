@@ -46,7 +46,7 @@ Here are some images, GIFs, and videos of the spider robot in action:
 | **JDY-33 Bluetooth Module** | 1 | Enables wireless communication (SPP & BLE). |
 | **Servo Motors** | 8 | Actuators for hip and knee joints. |
 | **liPo Battery** | 2 | 3.7V LiPo Battery. |
-| **3D Printed** | 1 | 3D printed for the spider. |
+| **3D Printed** | * | 3D printed for the spider. |
 
 ## Wiring Diagram
 
